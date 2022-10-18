@@ -44,10 +44,31 @@ TIM_HandleTypeDef htim1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-uint8_t stopped = 0;
-uint8_t state = 0;
-uint32_t delay = 500;
+const uint8_t NUMBERS[] = {
+        0b00000011,
+        0b10011111,
+        0b00100101,
+        0b00001101,
+        0b10011001,
+        0b01001001,
+        0b01000001,
+        0b00011111,
+        0b00000001,
+        0b00001001};
+#define UNDERSCORE_SMBL 0b11111101
 
+const uint8_t SEGMENTS[] = {0b10001111, 0b01001111, 0b00100000, 0b00010000};
+
+uint8_t NUMBER[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+uint8_t numberSize = 10;
+
+uint8_t isNumberSizeChoice = 0;
+
+uint8_t isGenerating = 0;
+
+uint16_t drawingDelay = 300;
+
+uint8_t currPos = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -56,7 +77,21 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_TIM1_Init(void);
 /* USER CODE BEGIN PFP */
-void setState(uint8_t curState);
+uint8_t nextRandom();
+
+void writeNumberToDisplay(uint8_t number, uint8_t segment);
+
+void writeByteToRegister(uint8_t byte);
+
+void generateNewNumber();
+
+void animatePins();
+
+void drawNumbers(uint8_t begin);
+
+void drawNumber(uint8_t number);
+
+void drawClearDisplay();
 
 /* USER CODE END PFP */
 
@@ -96,23 +131,36 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
-  uint8_t curState = 0;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+  generateNewNumber();
+  uint32_t lastChange = HAL_GetTick();
   while (1)
   {
     /* USER CODE END WHILE */
-    if (stopped == 0)
-    {
-      setState(curState);
-      if (curState < 3)
-        curState++;
-      else
-        curState = 0;
-    }
+
     /* USER CODE BEGIN 3 */
+    if (isGenerating == 0)
+    {
+      if (isNumberSizeChoice)
+      {
+        drawNumber(numberSize);
+      } else
+      {
+        drawNumbers(currPos);
+        if (HAL_GetTick() - lastChange > drawingDelay)
+        {
+          currPos++;
+          if (currPos > 9) currPos = 0;
+          lastChange = HAL_GetTick();
+        }
+      }
+    }
+    animatePins();
   }
   /* USER CODE END 3 */
 }
@@ -257,10 +305,11 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, LD1_Pin|LD2_Pin|LD3_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LD1_Pin|LD2_Pin|LD3_Pin|DISPLAY_CLK_Pin
+                          |DISPLAY_DATA_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LD4_GPIO_Port, LD4_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, DISPLAY_LATCH_Pin|LD4_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
@@ -274,8 +323,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LD1_Pin LD2_Pin LD3_Pin */
-  GPIO_InitStruct.Pin = LD1_Pin|LD2_Pin|LD3_Pin;
+  /*Configure GPIO pins : LD1_Pin LD2_Pin LD3_Pin DISPLAY_CLK_Pin
+                           DISPLAY_DATA_Pin */
+  GPIO_InitStruct.Pin = LD1_Pin|LD2_Pin|LD3_Pin|DISPLAY_CLK_Pin
+                          |DISPLAY_DATA_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -287,12 +338,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B_UP_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LD4_Pin */
-  GPIO_InitStruct.Pin = LD4_Pin;
+  /*Configure GPIO pins : DISPLAY_LATCH_Pin LD4_Pin */
+  GPIO_InitStruct.Pin = DISPLAY_LATCH_Pin|LD4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LD4_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
@@ -310,59 +361,158 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+uint32_t lastStartPress = 0;
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   switch (GPIO_Pin)
   {
     case B_START_Pin:
-      if (stopped == 1)
-        stopped = 0;
-      else
-        stopped = 1;
+      if ((HAL_GetTick() - lastStartPress) < 500)
+      {
+        isNumberSizeChoice = 1;
+        break;
+      }
+      if (isNumberSizeChoice)
+      {
+        isNumberSizeChoice = 0;
+      }
+      lastStartPress = HAL_GetTick();
+      generateNewNumber();
       break;
     case B_DOWN_Pin:
-      if (delay <= 900)
-        delay += 100;
+      if (isNumberSizeChoice)
+      {
+        if (numberSize - 1 > 1)
+        {
+          numberSize--;
+        }
+      } else {
+        if (drawingDelay < 650)
+        {
+          drawingDelay += 50;
+        }
+      }
       break;
     case B_UP_Pin:
-      if (delay >= 200)
-        delay -= 100;
+      if (isNumberSizeChoice)
+      {
+        if (numberSize + 1 < 20)
+        {
+          numberSize++;
+        }
+      } else {
+        if (drawingDelay > 150)
+        {
+          drawingDelay -= 50;
+        }
+      }
+      break;
   }
 }
 
-void setState(uint8_t curState)
+void writeNumberToDisplay(uint8_t number, uint8_t segment)
 {
-  HAL_Delay(delay);
-  switch (curState)
+  writeByteToRegister(number);
+  writeByteToRegister(segment);
+  HAL_GPIO_WritePin(DISPLAY_LATCH_GPIO_Port, DISPLAY_LATCH_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(DISPLAY_LATCH_GPIO_Port, DISPLAY_LATCH_Pin, GPIO_PIN_SET);
+}
+
+void writeByteToRegister(uint8_t number)
+{
+  for (int i = 0; i < 8; i++)
   {
-    case 0:
-      HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(LD4_GPIO_Port, LD4_Pin, GPIO_PIN_SET);
-      break;
-    case 1:
-      HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(LD4_GPIO_Port, LD4_Pin, GPIO_PIN_SET);
-      break;
-    case 2:
-      HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(LD4_GPIO_Port, LD4_Pin, GPIO_PIN_SET);
-      break;
-    case 3:
-      HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(LD4_GPIO_Port, LD4_Pin, GPIO_PIN_RESET);
-      break;
+    HAL_GPIO_WritePin(DISPLAY_CLK_GPIO_Port, DISPLAY_CLK_Pin, GPIO_PIN_RESET);
+    uint8_t bit = (number & (0b00000001 << i));
+    HAL_GPIO_WritePin(DISPLAY_DATA_GPIO_Port, DISPLAY_DATA_Pin, bit == 0 ? GPIO_PIN_RESET : GPIO_PIN_SET);
+    HAL_GPIO_WritePin(DISPLAY_CLK_GPIO_Port, DISPLAY_CLK_Pin, GPIO_PIN_SET);
   }
 }
 
+void drawNumbers(uint8_t begin)
+{
+  for (int i = 0; i < 4; i++)
+  {
+    if (begin + i < numberSize)
+      writeNumberToDisplay(NUMBERS[NUMBER[begin+i]], SEGMENTS[i]);
+    else
+      writeNumberToDisplay(0xFF, SEGMENTS[i]);
+  }
+}
+
+uint32_t seed = 7;
+uint32_t prev = 1;
+uint8_t nextRandom()
+{
+  uint32_t res = prev * seed % 10;
+  prev = res;
+  return (uint8_t) res;
+}
+
+void generateNewNumber()
+{
+  isGenerating = 1;
+  currPos = 0;
+  for (int i = 0; i < numberSize; i++)
+  {
+    NUMBER[i] = nextRandom();
+  }
+}
+
+uint32_t animationStart = 0;
+void animatePins()
+{
+  drawClearDisplay();
+  if (isGenerating)
+  {
+    HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(LD4_GPIO_Port, LD4_Pin, GPIO_PIN_SET);
+
+    if (animationStart == 0)
+      animationStart = HAL_GetTick();
+
+    if (HAL_GetTick() - animationStart > 200)
+      HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_RESET);
+
+    if (HAL_GetTick() - animationStart > 400)
+      HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+
+    if (HAL_GetTick() - animationStart > 600)
+      HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_RESET);
+
+    if (HAL_GetTick() - animationStart > 800)
+    {
+      HAL_GPIO_WritePin(LD4_GPIO_Port, LD4_Pin, GPIO_PIN_RESET);
+      isGenerating = 0;
+      animationStart = 0;
+    }
+  }
+}
+
+void drawClearDisplay()
+{
+  writeNumberToDisplay(0xFF, SEGMENTS[0]);
+  writeNumberToDisplay(0xFF, SEGMENTS[1]);
+  writeNumberToDisplay(0xFF, SEGMENTS[2]);
+  writeNumberToDisplay(0xFF, SEGMENTS[3]);
+}
+
+void drawNumber(uint8_t number)
+{
+  uint8_t t = number / 1000;
+  uint8_t h = number / 100;
+  uint8_t d = number / 10;
+  uint8_t o = number % 10;
+  if (t > 0) writeNumberToDisplay(NUMBERS[t], SEGMENTS[0]);
+  if (h > 0) writeNumberToDisplay(NUMBERS[h], SEGMENTS[1]);
+  if (d > 0) writeNumberToDisplay(NUMBERS[d], SEGMENTS[2]);
+  if (o > 0)
+    writeNumberToDisplay(NUMBERS[o], SEGMENTS[3]);
+  else
+    writeNumberToDisplay(NUMBERS[0], SEGMENTS[3]);
+}
 
 /* USER CODE END 4 */
 
