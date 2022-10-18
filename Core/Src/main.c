@@ -44,23 +44,39 @@ TIM_HandleTypeDef htim1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+#define SMB_0 0b00000011
+#define SMB_1 0b10011111
+#define SMB_2 0b00100101
+#define SMB_3 0b00001101
+#define SMB_4 0b10011001
+#define SMB_5 0b01001001
+#define SMB_6 0b01000001
+#define SMB_7 0b00011111
+#define SMB_8 0b00000001
+#define SMB_9 0b00001001
+#define SMB_DASH 0b00000011
+#define SMB_NONE 0b11111111
+
+#define DIG_1 0b10001111
+#define DIG_2 0b01001111
+#define DIG_3 0b00100000
+#define DIG_4 0b00010000
 const uint8_t NUMBERS[] = {
-        0b00000011,
-        0b10011111,
-        0b00100101,
-        0b00001101,
-        0b10011001,
-        0b01001001,
-        0b01000001,
-        0b00011111,
-        0b00000001,
-        0b00001001};
-#define UNDERSCORE_SMBL 0b11111101
+        SMB_0,
+        SMB_1,
+        SMB_2,
+        SMB_3,
+        SMB_4,
+        SMB_5,
+        SMB_6,
+        SMB_7,
+        SMB_8,
+        SMB_9};
 
-const uint8_t SEGMENTS[] = {0b10001111, 0b01001111, 0b00100000, 0b00010000};
+const uint8_t SEGMENTS[] = {DIG_1, DIG_2, DIG_3, DIG_4};
 
-uint8_t NUMBER[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-uint8_t numberSize = 10;
+uint8_t NUMBER[15] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int8_t numberSize = 10;
 
 uint8_t isNumberSizeChoice = 0;
 
@@ -68,7 +84,7 @@ uint8_t isGenerating = 0;
 
 uint16_t drawingDelay = 300;
 
-uint8_t currPos = 0;
+int8_t currPos = -4;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -81,18 +97,19 @@ uint8_t nextRandom();
 
 void writeNumberToDisplay(uint8_t number, uint8_t segment);
 
-void writeByteToRegister(uint8_t byte);
+void writeByteToRegister(uint8_t number);
 
 void generateNewNumber();
 
 void animatePins();
 
-void drawNumbers(uint8_t begin);
+void drawNumbers(int8_t begin);
 
 void drawNumber(uint8_t number);
 
 void drawClearDisplay();
 
+uint8_t debounceButton();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -144,6 +161,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    animatePins();
+
     if (isGenerating == 0)
     {
       if (isNumberSizeChoice)
@@ -155,12 +174,11 @@ int main(void)
         if (HAL_GetTick() - lastChange > drawingDelay)
         {
           currPos++;
-          if (currPos > 9) currPos = 0;
+          if (currPos > numberSize) currPos = -4;
           lastChange = HAL_GetTick();
         }
       }
     }
-    animatePins();
   }
   /* USER CODE END 3 */
 }
@@ -367,12 +385,20 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   switch (GPIO_Pin)
   {
     case B_START_Pin:
-      if ((HAL_GetTick() - lastStartPress) < 500)
+      if ((HAL_GetTick() - lastStartPress) < 100)
       {
-        isNumberSizeChoice = 1;
+        return;
+      }
+      if ((HAL_GetTick() - lastStartPress) < 700)
+      {
+        if (isNumberSizeChoice == 0)
+        {
+          isNumberSizeChoice = 1;
+        }
+        lastStartPress = HAL_GetTick();
         break;
       }
-      if (isNumberSizeChoice)
+      if (isNumberSizeChoice == 1)
       {
         isNumberSizeChoice = 0;
       }
@@ -382,7 +408,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     case B_DOWN_Pin:
       if (isNumberSizeChoice)
       {
-        if (numberSize - 1 > 1)
+        if (numberSize - 1 >= 1)
         {
           numberSize--;
         }
@@ -396,7 +422,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     case B_UP_Pin:
       if (isNumberSizeChoice)
       {
-        if (numberSize + 1 < 20)
+        if (numberSize + 1 <= 15)
         {
           numberSize++;
         }
@@ -429,14 +455,46 @@ void writeByteToRegister(uint8_t number)
   }
 }
 
-void drawNumbers(uint8_t begin)
+void drawNumbers(int8_t begin)
 {
-  for (int i = 0; i < 4; i++)
+  for (int8_t i = 0; i < 4; i++)
   {
-    if (begin + i < numberSize)
-      writeNumberToDisplay(NUMBERS[NUMBER[begin+i]], SEGMENTS[i]);
+    if (begin + i < numberSize && begin + i >= 0)
+    {
+      writeNumberToDisplay(NUMBERS[NUMBER[begin + i]], SEGMENTS[i]);
+    }
     else
+    {
       writeNumberToDisplay(0xFF, SEGMENTS[i]);
+    }
+  }
+}
+
+void drawNumber(uint8_t number)
+{
+  uint8_t t = number / 1000;
+  uint8_t h = number / 100;
+  uint8_t d = number / 10;
+  uint8_t o = number % 10;
+  if (t > 0)
+  {
+    writeNumberToDisplay(NUMBERS[t], SEGMENTS[0]);
+  }
+  if (h > 0)
+  {
+    writeNumberToDisplay(NUMBERS[h], SEGMENTS[1]);
+  }
+  if (d > 0)
+  {
+    writeNumberToDisplay(NUMBERS[d], SEGMENTS[2]);
+  }
+  if (o > 0)
+  {
+    writeNumberToDisplay(NUMBERS[o], SEGMENTS[3]);
+  }
+  else
+  {
+    writeNumberToDisplay(NUMBERS[0], SEGMENTS[3]);
   }
 }
 
@@ -452,11 +510,12 @@ uint8_t nextRandom()
 void generateNewNumber()
 {
   isGenerating = 1;
-  currPos = 0;
-  for (int i = 0; i < numberSize; i++)
+  currPos = -4;
+  for (uint8_t i = 0; i < numberSize; i++)
   {
     NUMBER[i] = nextRandom();
   }
+  return;
 }
 
 uint32_t animationStart = 0;
@@ -485,6 +544,10 @@ void animatePins()
     if (HAL_GetTick() - animationStart > 800)
     {
       HAL_GPIO_WritePin(LD4_GPIO_Port, LD4_Pin, GPIO_PIN_RESET);
+    }
+
+    if (HAL_GetTick() - animationStart > 1200)
+    {
       isGenerating = 0;
       animationStart = 0;
     }
@@ -493,27 +556,11 @@ void animatePins()
 
 void drawClearDisplay()
 {
-  writeNumberToDisplay(0xFF, SEGMENTS[0]);
-  writeNumberToDisplay(0xFF, SEGMENTS[1]);
-  writeNumberToDisplay(0xFF, SEGMENTS[2]);
-  writeNumberToDisplay(0xFF, SEGMENTS[3]);
+  writeNumberToDisplay(SMB_NONE, SEGMENTS[0]);
+  writeNumberToDisplay(SMB_NONE, SEGMENTS[1]);
+  writeNumberToDisplay(SMB_NONE, SEGMENTS[2]);
+  writeNumberToDisplay(SMB_NONE, SEGMENTS[3]);
 }
-
-void drawNumber(uint8_t number)
-{
-  uint8_t t = number / 1000;
-  uint8_t h = number / 100;
-  uint8_t d = number / 10;
-  uint8_t o = number % 10;
-  if (t > 0) writeNumberToDisplay(NUMBERS[t], SEGMENTS[0]);
-  if (h > 0) writeNumberToDisplay(NUMBERS[h], SEGMENTS[1]);
-  if (d > 0) writeNumberToDisplay(NUMBERS[d], SEGMENTS[2]);
-  if (o > 0)
-    writeNumberToDisplay(NUMBERS[o], SEGMENTS[3]);
-  else
-    writeNumberToDisplay(NUMBERS[0], SEGMENTS[3]);
-}
-
 /* USER CODE END 4 */
 
 /**
