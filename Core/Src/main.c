@@ -101,7 +101,7 @@ void writeByteToRegister(uint8_t number);
 
 void generateNewNumber();
 
-void animatePins();
+void animateLeds();
 
 void drawNumbers(int8_t begin);
 
@@ -161,7 +161,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    animatePins();
+    animateLeds();
 
     if (isGenerating == 0)
     {
@@ -519,7 +519,7 @@ void generateNewNumber()
 }
 
 uint32_t animationStart = 0;
-void animatePins()
+void animateLeds()
 {
   drawClearDisplay();
   if (isGenerating)
