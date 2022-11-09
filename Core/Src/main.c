@@ -54,7 +54,6 @@ UART_HandleTypeDef huart2;
 #define SMB_7 0b00011111
 #define SMB_8 0b00000001
 #define SMB_9 0b00001001
-#define SMB_DASH 0b00000011
 #define SMB_NONE 0b11111111
 
 #define DIG_1 0b10001111
@@ -380,12 +379,13 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 uint32_t lastStartPress = 0;
+uint32_t lastBtnPress = 0;
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   switch (GPIO_Pin)
   {
     case B_START_Pin:
-      if ((HAL_GetTick() - lastStartPress) < 100)
+      if ((HAL_GetTick() - lastBtnPress) < 100)
       {
         return;
       }
@@ -404,8 +404,13 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       }
       lastStartPress = HAL_GetTick();
       generateNewNumber();
+      lastBtnPress = HAL_GetTick();
       break;
     case B_DOWN_Pin:
+      if ((HAL_GetTick() - lastBtnPress) < 100)
+      {
+        return;
+      }
       if (isNumberSizeChoice)
       {
         if (numberSize - 1 >= 1)
@@ -418,8 +423,13 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
           drawingDelay += 50;
         }
       }
+      lastBtnPress = HAL_GetTick();
       break;
     case B_UP_Pin:
+      if ((HAL_GetTick() - lastBtnPress) < 100)
+      {
+        return;
+      }
       if (isNumberSizeChoice)
       {
         if (numberSize + 1 <= 15)
@@ -432,6 +442,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
           drawingDelay -= 50;
         }
       }
+      lastBtnPress = HAL_GetTick();
       break;
   }
 }
@@ -515,7 +526,6 @@ void generateNewNumber()
   {
     NUMBER[i] = nextRandom();
   }
-  return;
 }
 
 uint32_t animationStart = 0;
