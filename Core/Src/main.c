@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -31,6 +32,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define T_25   1.43f      // Напряжение (в вольтах) на датчике при температуре 25 °C.
+#define T_SLOPE  0.0043f    // Изменение напряжения (в вольтах) при изменении температуры на градус.
+#define V_REF    3.3f       // Образцовое напряжение АЦП (в вольтах).
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -39,6 +43,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef hadc1;
+
 TIM_HandleTypeDef htim1;
 
 UART_HandleTypeDef huart2;
@@ -88,9 +94,15 @@ int8_t currPos = -4;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+
 static void MX_GPIO_Init(void);
+
 static void MX_USART2_UART_Init(void);
+
 static void MX_TIM1_Init(void);
+
+static void MX_ADC1_Init(void);
+
 /* USER CODE BEGIN PFP */
 uint8_t nextRandom();
 
@@ -146,38 +158,35 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   MX_TIM1_Init();
+  MX_ADC1_Init();
+  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
-  generateNewNumber();
-  uint32_t lastChange = HAL_GetTick();
+  HAL_ADC_Start(&hadc1);
+  float temp = 0;
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    animateLeds();
-
-    if (isGenerating == 0)
+    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(LD4_GPIO_Port, LD4_Pin, GPIO_PIN_SET);
+    drawClearDisplay();
+    HAL_ADC_PollForConversion(&hadc1, 1000);
+    uint32_t adcVal = HAL_ADC_GetValue(&hadc1);
+    temp = (float) adcVal / 4096 * V_REF;
+    temp = (temp - T_25) / T_SLOPE + 25;
+    HAL_StatusTypeDef result = HAL_UART_Transmit(&huart2, (uint8_t *) &temp, sizeof(float), HAL_MAX_DELAY);
+    if (result == HAL_OK)
     {
-      if (isNumberSizeChoice)
-      {
-        drawNumber(numberSize);
-      } else
-      {
-        drawNumbers(currPos);
-        if (HAL_GetTick() - lastChange > drawingDelay)
-        {
-          currPos++;
-          if (currPos > numberSize) currPos = -4;
-          lastChange = HAL_GetTick();
-        }
-      }
+      HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
     }
+    HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
@@ -190,16 +199,18 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI_DIV2;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL16;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -207,8 +218,8 @@ void SystemClock_Config(void)
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
+                                | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
@@ -218,6 +229,60 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC | RCC_PERIPHCLK_USB;
+  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV6;
+  PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/**
+  * @brief ADC1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC1_Init(void)
+{
+
+  /* USER CODE BEGIN ADC1_Init 0 */
+
+  /* USER CODE END ADC1_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC1_Init 1 */
+
+  /* USER CODE END ADC1_Init 1 */
+
+  /** Common config
+  */
+  hadc1.Instance = ADC1;
+  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
+  hadc1.Init.ContinuousConvMode = ENABLE;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.NbrOfConversion = 1;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC1_Init 2 */
+
+  /* USER CODE END ADC1_Init 2 */
+
 }
 
 /**
@@ -322,11 +387,11 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, LD1_Pin|LD2_Pin|LD3_Pin|DISPLAY_CLK_Pin
-                          |DISPLAY_DATA_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LD1_Pin | LD2_Pin | LD3_Pin | DISPLAY_CLK_Pin
+                           | DISPLAY_DATA_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, DISPLAY_LATCH_Pin|LD4_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, DISPLAY_LATCH_Pin | LD4_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
@@ -335,15 +400,15 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : B_START_Pin B_DOWN_Pin */
-  GPIO_InitStruct.Pin = B_START_Pin|B_DOWN_Pin;
+  GPIO_InitStruct.Pin = B_START_Pin | B_DOWN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LD1_Pin LD2_Pin LD3_Pin DISPLAY_CLK_Pin
                            DISPLAY_DATA_Pin */
-  GPIO_InitStruct.Pin = LD1_Pin|LD2_Pin|LD3_Pin|DISPLAY_CLK_Pin
-                          |DISPLAY_DATA_Pin;
+  GPIO_InitStruct.Pin = LD1_Pin | LD2_Pin | LD3_Pin | DISPLAY_CLK_Pin
+                        | DISPLAY_DATA_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -356,7 +421,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(B_UP_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : DISPLAY_LATCH_Pin LD4_Pin */
-  GPIO_InitStruct.Pin = DISPLAY_LATCH_Pin|LD4_Pin;
+  GPIO_InitStruct.Pin = DISPLAY_LATCH_Pin | LD4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -380,6 +445,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 uint32_t lastStartPress = 0;
 uint32_t lastBtnPress = 0;
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   switch (GPIO_Pin)
@@ -417,7 +483,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         {
           numberSize--;
         }
-      } else {
+      } else
+      {
         if (drawingDelay < 650)
         {
           drawingDelay += 50;
@@ -436,7 +503,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         {
           numberSize++;
         }
-      } else {
+      } else
+      {
         if (drawingDelay > 150)
         {
           drawingDelay -= 50;
@@ -473,8 +541,7 @@ void drawNumbers(int8_t begin)
     if (begin + i < numberSize && begin + i >= 0)
     {
       writeNumberToDisplay(NUMBERS[NUMBER[begin + i]], SEGMENTS[i]);
-    }
-    else
+    } else
     {
       writeNumberToDisplay(0xFF, SEGMENTS[i]);
     }
@@ -502,8 +569,7 @@ void drawNumber(uint8_t number)
   if (o > 0)
   {
     writeNumberToDisplay(NUMBERS[o], SEGMENTS[3]);
-  }
-  else
+  } else
   {
     writeNumberToDisplay(NUMBERS[0], SEGMENTS[3]);
   }
@@ -511,6 +577,7 @@ void drawNumber(uint8_t number)
 
 uint32_t seed = 7;
 uint32_t prev = 1;
+
 uint8_t nextRandom()
 {
   uint32_t res = prev * seed % 10;
@@ -529,6 +596,7 @@ void generateNewNumber()
 }
 
 uint32_t animationStart = 0;
+
 void animateLeds()
 {
   drawClearDisplay();

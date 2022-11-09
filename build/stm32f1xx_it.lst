@@ -1,4 +1,4 @@
-ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 1
+ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 1
   30:Core/Src/stm32f1xx_it.c **** /* USER CODE END TD */
   31:Core/Src/stm32f1xx_it.c **** 
   32:Core/Src/stm32f1xx_it.c **** /* Private define ------------------------------------------------------------*/
-ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 2
+ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s 			page 2
 
 
   33:Core/Src/stm32f1xx_it.c **** /* USER CODE BEGIN PD */
@@ -86,7 +86,7 @@ ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 1
   55:Core/Src/stm32f1xx_it.c **** /* USER CODE END 0 */
   56:Core/Src/stm32f1xx_it.c **** 
   57:Core/Src/stm32f1xx_it.c **** /* External variables --------------------------------------------------------*/
-  58:Core/Src/stm32f1xx_it.c **** 
+  58:Core/Src/stm32f1xx_it.c **** extern PCD_HandleTypeDef hpcd_USB_FS;
   59:Core/Src/stm32f1xx_it.c **** /* USER CODE BEGIN EV */
   60:Core/Src/stm32f1xx_it.c **** 
   61:Core/Src/stm32f1xx_it.c **** /* USER CODE END EV */
@@ -118,7 +118,7 @@ ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 1
   75:Core/Src/stm32f1xx_it.c ****   {
   36              		.loc 1 75 9 discriminator 1 view .LVU3
   37 0000 FEE7     		b	.L2
-ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 3
+ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s 			page 3
 
 
   38              		.cfi_endproc
@@ -178,7 +178,7 @@ ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 1
  100:Core/Src/stm32f1xx_it.c **** {
   73              		.loc 1 100 1 view -0
   74              		.cfi_startproc
-ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 4
+ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s 			page 4
 
 
   75              		@ Volatile: function does not return.
@@ -238,7 +238,7 @@ ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 1
  106 0000 FEE7     		b	.L8
  107              		.cfi_endproc
  108              	.LFE68:
-ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 5
+ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s 			page 5
 
 
  110              		.section	.text.UsageFault_Handler,"ax",%progbits
@@ -298,7 +298,7 @@ ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 1
  144              		@ args = 0, pretend = 0, frame = 0
  145              		@ frame_needed = 0, uses_anonymous_args = 0
  146              		@ link register save eliminated.
-ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 6
+ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s 			page 6
 
 
  146:Core/Src/stm32f1xx_it.c ****   /* USER CODE BEGIN SVCall_IRQn 0 */
@@ -358,7 +358,7 @@ ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 1
  171:Core/Src/stm32f1xx_it.c **** {
  180              		.loc 1 171 1 view -0
  181              		.cfi_startproc
-ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 7
+ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s 			page 7
 
 
  182              		@ args = 0, pretend = 0, frame = 0
@@ -418,7 +418,7 @@ ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 1
  218              		.global	EXTI0_IRQHandler
  219              		.syntax unified
  220              		.thumb
-ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 8
+ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s 			page 8
 
 
  221              		.thumb_func
@@ -478,7 +478,7 @@ ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 1
  219:Core/Src/stm32f1xx_it.c **** {
  252              		.loc 1 219 1 is_stmt 1 view -0
  253              		.cfi_startproc
-ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 9
+ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s 			page 9
 
 
  254              		@ args = 0, pretend = 0, frame = 0
@@ -538,7 +538,7 @@ ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 1
  238:Core/Src/stm32f1xx_it.c ****   /* USER CODE BEGIN EXTI4_IRQn 1 */
  239:Core/Src/stm32f1xx_it.c **** 
  240:Core/Src/stm32f1xx_it.c ****   /* USER CODE END EXTI4_IRQn 1 */
-ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 10
+ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s 			page 10
 
 
  241:Core/Src/stm32f1xx_it.c **** }
@@ -546,19 +546,19 @@ ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 1
  293 0008 08BD     		pop	{r3, pc}
  294              		.cfi_endproc
  295              	.LFE76:
- 297              		.section	.text.EXTI15_10_IRQHandler,"ax",%progbits
+ 297              		.section	.text.USB_LP_CAN1_RX0_IRQHandler,"ax",%progbits
  298              		.align	1
- 299              		.global	EXTI15_10_IRQHandler
+ 299              		.global	USB_LP_CAN1_RX0_IRQHandler
  300              		.syntax unified
  301              		.thumb
  302              		.thumb_func
- 304              	EXTI15_10_IRQHandler:
+ 304              	USB_LP_CAN1_RX0_IRQHandler:
  305              	.LFB77:
  242:Core/Src/stm32f1xx_it.c **** 
  243:Core/Src/stm32f1xx_it.c **** /**
- 244:Core/Src/stm32f1xx_it.c ****   * @brief This function handles EXTI line[15:10] interrupts.
+ 244:Core/Src/stm32f1xx_it.c ****   * @brief This function handles USB low priority or CAN RX0 interrupts.
  245:Core/Src/stm32f1xx_it.c ****   */
- 246:Core/Src/stm32f1xx_it.c **** void EXTI15_10_IRQHandler(void)
+ 246:Core/Src/stm32f1xx_it.c **** void USB_LP_CAN1_RX0_IRQHandler(void)
  247:Core/Src/stm32f1xx_it.c **** {
  306              		.loc 1 247 1 is_stmt 1 view -0
  307              		.cfi_startproc
@@ -569,60 +569,115 @@ ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 1
  312              		.cfi_def_cfa_offset 8
  313              		.cfi_offset 3, -8
  314              		.cfi_offset 14, -4
- 248:Core/Src/stm32f1xx_it.c ****   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
+ 248:Core/Src/stm32f1xx_it.c ****   /* USER CODE BEGIN USB_LP_CAN1_RX0_IRQn 0 */
  249:Core/Src/stm32f1xx_it.c **** 
- 250:Core/Src/stm32f1xx_it.c ****   /* USER CODE END EXTI15_10_IRQn 0 */
- 251:Core/Src/stm32f1xx_it.c ****   HAL_GPIO_EXTI_IRQHandler(B1_Pin);
+ 250:Core/Src/stm32f1xx_it.c ****   /* USER CODE END USB_LP_CAN1_RX0_IRQn 0 */
+ 251:Core/Src/stm32f1xx_it.c ****   HAL_PCD_IRQHandler(&hpcd_USB_FS);
  315              		.loc 1 251 3 view .LVU39
- 316 0002 4FF40050 		mov	r0, #8192
- 317 0006 FFF7FEFF 		bl	HAL_GPIO_EXTI_IRQHandler
+ 316 0002 0248     		ldr	r0, .L24
+ 317 0004 FFF7FEFF 		bl	HAL_PCD_IRQHandler
  318              	.LVL4:
- 252:Core/Src/stm32f1xx_it.c ****   /* USER CODE BEGIN EXTI15_10_IRQn 1 */
+ 252:Core/Src/stm32f1xx_it.c ****   /* USER CODE BEGIN USB_LP_CAN1_RX0_IRQn 1 */
  253:Core/Src/stm32f1xx_it.c **** 
- 254:Core/Src/stm32f1xx_it.c ****   /* USER CODE END EXTI15_10_IRQn 1 */
+ 254:Core/Src/stm32f1xx_it.c ****   /* USER CODE END USB_LP_CAN1_RX0_IRQn 1 */
  255:Core/Src/stm32f1xx_it.c **** }
  319              		.loc 1 255 1 is_stmt 0 view .LVU40
- 320 000a 08BD     		pop	{r3, pc}
- 321              		.cfi_endproc
- 322              	.LFE77:
- 324              		.text
- 325              	.Letext0:
- 326              		.file 2 "/Applications/ARM/arm-none-eabi/include/machine/_default_types.h"
- 327              		.file 3 "/Applications/ARM/arm-none-eabi/include/sys/_stdint.h"
- 328              		.file 4 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
- 329              		.file 5 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
-ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s 			page 11
+ 320 0008 08BD     		pop	{r3, pc}
+ 321              	.L25:
+ 322 000a 00BF     		.align	2
+ 323              	.L24:
+ 324 000c 00000000 		.word	hpcd_USB_FS
+ 325              		.cfi_endproc
+ 326              	.LFE77:
+ 328              		.section	.text.EXTI15_10_IRQHandler,"ax",%progbits
+ 329              		.align	1
+ 330              		.global	EXTI15_10_IRQHandler
+ 331              		.syntax unified
+ 332              		.thumb
+ 333              		.thumb_func
+ 335              	EXTI15_10_IRQHandler:
+ 336              	.LFB78:
+ 256:Core/Src/stm32f1xx_it.c **** 
+ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s 			page 11
+
+
+ 257:Core/Src/stm32f1xx_it.c **** /**
+ 258:Core/Src/stm32f1xx_it.c ****   * @brief This function handles EXTI line[15:10] interrupts.
+ 259:Core/Src/stm32f1xx_it.c ****   */
+ 260:Core/Src/stm32f1xx_it.c **** void EXTI15_10_IRQHandler(void)
+ 261:Core/Src/stm32f1xx_it.c **** {
+ 337              		.loc 1 261 1 is_stmt 1 view -0
+ 338              		.cfi_startproc
+ 339              		@ args = 0, pretend = 0, frame = 0
+ 340              		@ frame_needed = 0, uses_anonymous_args = 0
+ 341 0000 08B5     		push	{r3, lr}
+ 342              	.LCFI5:
+ 343              		.cfi_def_cfa_offset 8
+ 344              		.cfi_offset 3, -8
+ 345              		.cfi_offset 14, -4
+ 262:Core/Src/stm32f1xx_it.c ****   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
+ 263:Core/Src/stm32f1xx_it.c **** 
+ 264:Core/Src/stm32f1xx_it.c ****   /* USER CODE END EXTI15_10_IRQn 0 */
+ 265:Core/Src/stm32f1xx_it.c ****   HAL_GPIO_EXTI_IRQHandler(B1_Pin);
+ 346              		.loc 1 265 3 view .LVU42
+ 347 0002 4FF40050 		mov	r0, #8192
+ 348 0006 FFF7FEFF 		bl	HAL_GPIO_EXTI_IRQHandler
+ 349              	.LVL5:
+ 266:Core/Src/stm32f1xx_it.c ****   /* USER CODE BEGIN EXTI15_10_IRQn 1 */
+ 267:Core/Src/stm32f1xx_it.c **** 
+ 268:Core/Src/stm32f1xx_it.c ****   /* USER CODE END EXTI15_10_IRQn 1 */
+ 269:Core/Src/stm32f1xx_it.c **** }
+ 350              		.loc 1 269 1 is_stmt 0 view .LVU43
+ 351 000a 08BD     		pop	{r3, pc}
+ 352              		.cfi_endproc
+ 353              	.LFE78:
+ 355              		.text
+ 356              	.Letext0:
+ 357              		.file 2 "/Applications/ARM/arm-none-eabi/include/machine/_default_types.h"
+ 358              		.file 3 "/Applications/ARM/arm-none-eabi/include/sys/_stdint.h"
+ 359              		.file 4 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 360              		.file 5 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
+ 361              		.file 6 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h"
+ 362              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h"
+ 363              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
+ 364              		.file 9 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ARM GAS  /var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s 			page 12
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 stm32f1xx_it.c
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:18     .text.NMI_Handler:0000000000000000 $t
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:24     .text.NMI_Handler:0000000000000000 NMI_Handler
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:42     .text.HardFault_Handler:0000000000000000 $t
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:48     .text.HardFault_Handler:0000000000000000 HardFault_Handler
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:65     .text.MemManage_Handler:0000000000000000 $t
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:71     .text.MemManage_Handler:0000000000000000 MemManage_Handler
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:88     .text.BusFault_Handler:0000000000000000 $t
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:94     .text.BusFault_Handler:0000000000000000 BusFault_Handler
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:111    .text.UsageFault_Handler:0000000000000000 $t
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:117    .text.UsageFault_Handler:0000000000000000 UsageFault_Handler
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:134    .text.SVC_Handler:0000000000000000 $t
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:140    .text.SVC_Handler:0000000000000000 SVC_Handler
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:153    .text.DebugMon_Handler:0000000000000000 $t
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:159    .text.DebugMon_Handler:0000000000000000 DebugMon_Handler
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:172    .text.PendSV_Handler:0000000000000000 $t
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:178    .text.PendSV_Handler:0000000000000000 PendSV_Handler
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:191    .text.SysTick_Handler:0000000000000000 $t
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:197    .text.SysTick_Handler:0000000000000000 SysTick_Handler
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:217    .text.EXTI0_IRQHandler:0000000000000000 $t
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:223    .text.EXTI0_IRQHandler:0000000000000000 EXTI0_IRQHandler
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:244    .text.EXTI1_IRQHandler:0000000000000000 $t
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:250    .text.EXTI1_IRQHandler:0000000000000000 EXTI1_IRQHandler
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:271    .text.EXTI4_IRQHandler:0000000000000000 $t
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:277    .text.EXTI4_IRQHandler:0000000000000000 EXTI4_IRQHandler
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:298    .text.EXTI15_10_IRQHandler:0000000000000000 $t
-/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccfcTtkw.s:304    .text.EXTI15_10_IRQHandler:0000000000000000 EXTI15_10_IRQHandler
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:18     .text.NMI_Handler:0000000000000000 $t
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:24     .text.NMI_Handler:0000000000000000 NMI_Handler
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:42     .text.HardFault_Handler:0000000000000000 $t
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:48     .text.HardFault_Handler:0000000000000000 HardFault_Handler
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:65     .text.MemManage_Handler:0000000000000000 $t
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:71     .text.MemManage_Handler:0000000000000000 MemManage_Handler
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:88     .text.BusFault_Handler:0000000000000000 $t
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:94     .text.BusFault_Handler:0000000000000000 BusFault_Handler
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:111    .text.UsageFault_Handler:0000000000000000 $t
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:117    .text.UsageFault_Handler:0000000000000000 UsageFault_Handler
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:134    .text.SVC_Handler:0000000000000000 $t
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:140    .text.SVC_Handler:0000000000000000 SVC_Handler
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:153    .text.DebugMon_Handler:0000000000000000 $t
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:159    .text.DebugMon_Handler:0000000000000000 DebugMon_Handler
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:172    .text.PendSV_Handler:0000000000000000 $t
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:178    .text.PendSV_Handler:0000000000000000 PendSV_Handler
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:191    .text.SysTick_Handler:0000000000000000 $t
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:197    .text.SysTick_Handler:0000000000000000 SysTick_Handler
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:217    .text.EXTI0_IRQHandler:0000000000000000 $t
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:223    .text.EXTI0_IRQHandler:0000000000000000 EXTI0_IRQHandler
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:244    .text.EXTI1_IRQHandler:0000000000000000 $t
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:250    .text.EXTI1_IRQHandler:0000000000000000 EXTI1_IRQHandler
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:271    .text.EXTI4_IRQHandler:0000000000000000 $t
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:277    .text.EXTI4_IRQHandler:0000000000000000 EXTI4_IRQHandler
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:298    .text.USB_LP_CAN1_RX0_IRQHandler:0000000000000000 $t
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:304    .text.USB_LP_CAN1_RX0_IRQHandler:0000000000000000 USB_LP_CAN1_RX0_IRQHandler
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:324    .text.USB_LP_CAN1_RX0_IRQHandler:000000000000000c $d
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:329    .text.EXTI15_10_IRQHandler:0000000000000000 $t
+/var/folders/4j/h0s8jllx34d4kvb_9k9v0kmh0000gn/T//ccr8NOT9.s:335    .text.EXTI15_10_IRQHandler:0000000000000000 EXTI15_10_IRQHandler
 
 UNDEFINED SYMBOLS
 HAL_IncTick
 HAL_GPIO_EXTI_IRQHandler
+HAL_PCD_IRQHandler
+hpcd_USB_FS
